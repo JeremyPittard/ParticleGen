@@ -1,0 +1,100 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Just A Particle Generator</title>
+  <meta name="description" content="Particle generator">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="particlegen.css">
+
+ 
+</head>
+
+<body>
+<canvas id="canvas"></canvas>
+  <script>
+	var canvas = document.getElementById("canvas");
+//sets the context so the canvas can be drawn on
+var ctx = canvas.getContext("2d");
+// sets canvas height/width to that of the viewport
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+var particles = [];
+//this is the amount of particles on the canvas, have a play
+var total_particles = 1500;
+
+//function to generate random colour for particles randomly generates rgb to insert 
+function getRandomColor() {
+  var r=0, g=0, b=0; 
+  // values over 100 mean brighter colours
+  while (r < 100 && g < 100 && b <100)
+    {
+      r=Math.floor(Math.random() * 256);
+      g=Math.floor(Math.random() * 256);
+      b=Math.floor(Math.random() * 256);
+    }
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+//creating a particle 
+// this is a particle constructor
+var Particle = function () {
+  
+  this.x = canvas.width * Math.random();
+  this.y = canvas.height * Math.random();
+  // velocity of particles between 2 and -2
+  this.vx = 4 * Math.random() - 2;
+  this.vy = 4 * Math.random() - 2;
+  //calls random colour generator
+  this.Color = getRandomColor();
+  
+}
+
+//drawing the particle
+Particle.prototype.Draw = function (ctx) {
+  //applies color
+  ctx.fillStyle = this.Color;
+  //makes rectangle size 2x2px
+  ctx.fillRect(this.x, this.y, 2,2);
+  
+}
+
+/*
+The Update first updates the position by adding the current position with velocity  and then checks if the updated position reached outside of the boundary / border of the canvas . */
+
+Particle.prototype.Update = function () {
+  
+  this.x += this.vx;
+  this.y += this.vy;
+  
+  // if the x or y position is less than 0 or bigger than the width of the canvas the code will reverse velocity making a bounce effect
+  
+  if (this.x<0 || this.x > canvas.width)
+      this.vx = -this.vx;
+  
+  if (this.y<0 || this.y > canvas.height)
+      this.vy = -this.vy;
+  
+}
+
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+ 
+    for (var i = 0; i < total_particles; i++) {
+        particles[i].Update();
+        particles[i].Draw(ctx);
+    }
+    requestAnimationFrame(loop);
+}
+
+for (var i = 0; i < total_particles; i++)
+    particles.push(new Particle());
+ 
+loop();
+
+  </script>
+</body>
+</html>
